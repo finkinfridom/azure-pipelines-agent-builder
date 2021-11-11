@@ -35,7 +35,14 @@ $agentZip="$PWD\agent.zip";
 
 $DefaultProxy=[System.Net.WebRequest]::DefaultWebProxy;
 $WebClient=New-Object Net.WebClient; 
-$Uri='https://vstsagentpackage.azureedge.net/agent/2.183.1/vsts-agent-win-x64-2.183.1.zip';
+
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$wr = Invoke-WebRequest https://api.github.com/repos/Microsoft/azure-pipelines-agent/releases/latest
+$tag = ($wr | ConvertFrom-Json)[0].tag_name
+$tag = $tag.Substring(1)
+
+write-host "$tag is the latest version"
+$Uri = "https://vstsagentpackage.azureedge.net/agent/$tag/vsts-agent-win-x64-$tag.zip"
 
 
 if($DefaultProxy -and (-not $DefaultProxy.IsBypassed($Uri)))
